@@ -1,567 +1,355 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>فهم مقروء — منتزه خرطم</title>
+<title>اختبار الفهم القرائي — منتزه خرطم</title>
 <style>
   :root{
-    --green:#1e7f3d;
-    --green-700:#156733;
-    --green-50:#f1fbf5;
-    --white:#ffffff;
-    --gold:#c9a544;
-    --shadow:0 8px 24px rgba(0,0,0,.12);
+    --green:#1e7f3d; --green-700:#156733; --green-50:#f1fbf5; --gold:#c9a544; --ink:#0b2e19;
+    --card-bg:rgba(255,255,255,.94); --bd:#e6efe9; --muted:#38684e;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, "Segoe UI", "Noto Naskh Arabic UI", "Tahoma", sans-serif;
-    background: linear-gradient(180deg, var(--green-50), #e9f7ef);
-    color:#0b2e19;
-  }
-  .app{
-    max-width: 980px;
-    margin: 24px auto;
-    padding: 16px;
-  }
-  .card{
-    position: relative;
-    background: rgba(255,255,255,.92);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    border: 1px solid #e6efe9;
-  }
-  /* علامة مائية بالشعار */
-  .card::before{
-    content:"";
-    position:absolute; inset:0;
-    background:
-      url("https://i.postimg.cc/Lhdfcttc/IMG-7700.jpg")
-      center/420px 420px no-repeat;
-    opacity: .08; /* شفافية العلامة المائية */
-    pointer-events:none;
-    mix-blend-mode: multiply;
-  }
-  header.hero{
-    padding: 20px 20px 12px;
-    background: linear-gradient(90deg, var(--green), var(--green-700));
-    color:var(--white);
-    border-bottom: 4px solid var(--gold);
-  }
-  header.hero h1{
-    margin:0 0 8px;
-    font-size: clamp(20px, 3.2vw, 28px);
-    letter-spacing:.2px;
-  }
-  header.hero .sub{
-    opacity:.95;
-    font-size: 15px;
-  }
-
-  .content{ padding: 18px; position: relative; z-index: 1;}
-
-  .badge{
-    display:inline-block;
-    background: var(--gold);
-    color: #2d2005;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight:600;
-    font-size: 13px;
-    margin-bottom: 8px;
-  }
-  .row{ display:flex; gap:16px; flex-wrap:wrap; }
-  .col{ flex:1 1 320px; }
-
-  .input{
-    width:100%;
-    border:1px solid #dfe9e3;
-    border-radius:10px;
-    padding:12px 14px;
-    font-size:16px;
-    background:#fff;
-  }
-  .btn{
-    appearance:none;
-    border:none;
-    border-radius:12px;
-    padding:12px 18px;
-    font-size:16px;
-    cursor:pointer;
-    background: var(--green);
-    color:#fff;
-    font-weight:700;
-    box-shadow: 0 6px 16px rgba(30,127,61,.25);
-    transition: transform .06s ease, opacity .2s ease;
-  }
-  .btn:hover{ transform: translateY(-1px) }
-  .btn:active{ transform: translateY(0) scale(.98) }
-  .btn.secondary{
-    background:#0b2e19;
-    box-shadow: 0 6px 16px rgba(11,46,25,.16);
-  }
-  .btn.ghost{
-    background: transparent;
-    color: var(--green);
-    border: 2px solid var(--green);
-    box-shadow:none;
-  }
-  .center{ text-align:center }
-  .muted{ color:#38684e }
-  .foot-note{ font-size:13px; color:#35654c; margin-top:8px }
-
-  /* النص الطويل */
-  .long-text{
-    background: #ffffffd9;
-    border: 1px solid #eaf3ee;
-    border-radius: 12px;
-    padding: 14px 16px;
-    line-height: 1.9;
-  }
-
-  /* الخيارات */
-  .choice{
-    border:1px solid #e0eee6;
-    background:#ffffff;
-    padding:12px 12px;
-    border-radius:12px;
-    margin:10px 0;
-    display:flex;
-    gap:10px;
-    align-items:flex-start;
-    transition: background .15s ease, border-color .15s ease;
-  }
-  .choice input{ margin-top:4px; transform: scale(1.15); }
-  .choice:hover{ background:#f6fbf8; border-color:#cfe6da }
-  .choice.correct{ border-color:#18a957; background:#eefbf3 }
-  .choice.wrong{ border-color:#d35454; background:#fff1f1 }
-
-  .progress{
-    height:10px; background:#e9f5ee; border-radius:999px; overflow:hidden; margin:10px 0 0;
-    border:1px solid #dbeee3;
-  }
-  .progress > i{ display:block; height:100%; width:0%; background: linear-gradient(90deg, #1e7f3d, #2fb36a); }
-
-  .score-big{
-    font-size: clamp(34px, 6vw, 48px);
-    margin: 6px 0 0;
-    color:#0b2e19;
-  }
-  .top5{
-    list-style:none; padding:0; margin:10px 0 0;
-    border:1px solid #e6efe9; border-radius:12px; overflow:hidden;
-  }
-  .top5 li{
-    padding:10px 12px; background:#fff; display:flex; justify-content:space-between; align-items:center;
-  }
-  .top5 li:nth-child(odd){ background:#f8fcf9 }
-  .pill{ background:#e8f6ee; color:#0b2e19; padding:2px 10px; border-radius:999px; font-weight:700 }
-
-  footer.credit{
-    text-align:center; padding:10px 14px 18px; color:#2d2005;
-  }
-  footer .sig{
-    display:inline-block;
-    background: linear-gradient(90deg, #f3e5c1, #e8d292);
-    color:#2d2005; border:1px solid #e2c988;
-    padding:6px 12px; border-radius:10px; font-weight:800;
-  }
-
-  /* إخفاء/إظهار الشاشات */
-  .screen{ display:none; }
-  .screen.active{ display:block; }
-
-  /* لمستقبل سفاري/جوال */
-  @media (hover:none){
-    .btn:hover{ transform:none }
-  }
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Naskh Arabic UI","Tahoma",sans-serif;background:linear-gradient(180deg,var(--green-50),#e9f7ef);color:var(--ink)}
+  .app{max-width:980px;margin:24px auto;padding:16px}
+  .card{position:relative;background:var(--card-bg);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0;background:url("https://i.postimg.cc/Lhdfcttc/IMG-7700.jpg") center/420px 420px no-repeat;opacity:.08;pointer-events:none;mix-blend-mode:multiply}
+  header.hero{padding:20px 20px 12px;background:linear-gradient(90deg,var(--green),var(--green-700));color:#fff;border-bottom:4px solid var(--gold)}
+  header.hero h1{margin:0 0 8px;font-size:clamp(20px,3.2vw,28px)}
+  header.hero .sub{opacity:.95;font-size:15px}
+  .content{padding:18px;position:relative;z-index:1}
+  .badge{display:inline-block;background:var(--gold);color:#2d2005;padding:4px 10px;border-radius:999px;font-weight:700;font-size:13px;margin-bottom:8px}
+  .row{display:flex;gap:16px;flex-wrap:wrap}.col{flex:1 1 320px}
+  .input{width:100%;border:1px solid #dfe9e3;border-radius:10px;padding:12px 14px;font-size:16px;background:#fff}
+  .btn{appearance:none;border:none;border-radius:12px;padding:12px 18px;font-size:16px;cursor:pointer;background:var(--green);color:#fff;font-weight:800;box-shadow:0 6px 16px rgba(30,127,61,.25);transition:transform .06s}
+  .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0) scale(.98)}
+  .btn.secondary{background:#0b2e19} .btn.ghost{background:transparent;color:var(--green);border:2px solid var(--green);box-shadow:none}
+  .muted{color:var(--muted)} .foot-note{font-size:13px;color:#35654c;margin-top:8px}
+  .long-text{background:#ffffffd9;border:1px solid #eaf3ee;border-radius:12px;padding:14px 16px;line-height:1.9}
+  .choice{border:1px solid #e0eee6;background:#fff;padding:12px;border-radius:12px;margin:10px 0;display:flex;gap:10px;align-items:flex-start}
+  .choice:hover{background:#f6fbf8;border-color:#cfe6da}
+  .choice.correct{border-color:#18a957;background:#eefbf3} .choice.wrong{border-color:#d35454;background:#fff1f1}
+  .progress{height:10px;background:#e9f5ee;border-radius:999px;overflow:hidden;border:1px solid #dbeee3}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e7f3d,#2fb36a)}
+  .score-big{font-size:clamp(34px,6vw,48px);margin:6px 0 0;color:var(--ink)}
+  .top5{list-style:none;padding:0;margin:10px 0 0;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+  .top5 li{padding:10px 12px;background:#fff;display:flex;justify-content:space-between;align-items:center}
+  .top5 li:nth-child(odd){background:#f8fcf9} .pill{background:#e8f6ee;color:var(--ink);padding:2px 10px;border-radius:999px;font-weight:800}
+  footer.credit{text-align:center;padding:10px 14px 18px;color:#2d2005}
+  footer .sig{display:inline-block;background:linear-gradient(90deg,#f3e5c1,#e8d292);color:#2d2005;border:1px solid #e2c988;padding:6px 12px;border-radius:10px;font-weight:800}
+  .screen{display:none}.screen.active{display:block}
+  .timer{font-weight:800;color:#0b3b22}
+  .cert{border:2px dashed #d9e8de;background:#ffffff; padding:16px;border-radius:12px;margin-top:16px}
+  .cert h3{margin:4px 0 8px}
+  @media(hover:none){.btn:hover{transform:none}}
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <header class="hero">
-        <div class="badge">اختبار فهم مقروء</div>
-        <h1>رحلة إلى <span style="color:#c9e8d6;">منتزه خرطم</span></h1>
-        <div class="sub">مدرسة الإمام الشوكاني — الصف السادس</div>
-      </header>
+<div class="app">
+  <div class="card">
+    <header class="hero">
+      <div class="badge">اختبار فهم مقروء</div>
+      <h1>رحلة إلى <span style="color:#c9e8d6;">منتزه خرطم</span></h1>
+      <div class="sub">مدرسة الإمام الشوكاني — الصف السادس</div>
+    </header>
 
-      <div class="content">
-        <!-- شاشة البداية -->
-        <section id="screen-welcome" class="screen active">
-          <div class="row">
-            <div class="col">
-              <h2 style="margin:6px 0 10px">مرحبًا بك 👋</h2>
-              <p class="muted">اكتب اسمك ثم ابدأ القراءة والإجابة. الدرجة من 100، ويوجد <strong>توب فايف</strong> لأعلى الدرجات.</p>
-              <label for="studentName" class="muted">اسم الطالب</label>
-              <input id="studentName" class="input" placeholder="اكتب اسمك هنا" autocomplete="off" />
-              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn" id="btnStart">ابدأ الاختبار</button>
-                <button class="btn ghost" id="btnViewTop">عرض التوب فايف</button>
-              </div>
-              <p class="foot-note">تلميح: يُفضّل استخدام الاسم الأول فقط حفاظًا على الخصوصية.</p>
-            </div>
+    <div class="content">
+      <!-- شاشة البداية -->
+      <section id="screen-welcome" class="screen active">
+        <h2 style="margin:6px 0 10px">مرحبًا بك 👋</h2>
+        <p class="muted">اكتب اسمك ثم ابدأ القراءة والإجابة. الدرجة من 100، ويوجد <strong>توب فايف</strong> لأعلى الدرجات.</p>
+        <label for="studentName" class="muted">اسم الطالب</label>
+        <input id="studentName" class="input" placeholder="اكتب اسمك هنا" autocomplete="off" />
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="btnStart">ابدأ الاختبار</button>
+          <button class="btn ghost" id="btnViewTop">عرض التوب فايف</button>
+        </div>
+        <p class="foot-note">تلميح: يُفضّل استخدام الاسم الأول فقط حفاظًا على الخصوصية.</p>
+      </section>
+
+      <!-- نص القراءة -->
+      <section id="screen-reading" class="screen">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 style="margin:0">اقرأ النص التالي بعناية:</h3>
+          <div class="timer">⏳ الوقت: <span id="timeLeft">—</span></div>
+        </div>
+        <article class="long-text" id="readingText">
+          <strong>عنوان النص: "رحلة إلى منتزه خَرْطَم"</strong><br><br>
+          في صباحٍ جميلٍ من أيام فصل الشتاء، قرّر طلابُ الصفِّ السادس في مدرسة الإمام الشوكاني القيامَ برحلةٍ تعليميةٍ إلى
+          <em>منتزه خَرْطَم</em>، وهو من الأماكن الطبيعية الجميلة التي يقصدها الزوّار للاستمتاع بالهواء النقي والطبيعة الهادئة.
+          انطلق الطلابُ مع معلميهم بالحافلة وهم يشعرون بالحماس والفرح، وكانوا يتطلّعون لرؤية الأشجار والجبال الصغيرة التي سمعوا عنها كثيرًا.<br><br>
+          حين وصلوا إلى المنتزه، استقبلتهم الطبيعةُ بجمالٍ أخَّاذ؛ فقد انتشرت الأشجارُ الخضراء في كلِّ مكان، وبدت الأرضُ مكسوَّةً بالأعشاب،
+          بينما كان الهواء العليل يُنعش النفوس. بدأ الطلابُ بالتجوّل وهم يسجّلون ملاحظاتهم في دفاترهم، كما التقطوا العديد من الصور التذكارية.
+          وقد أخبرهم المعلم أن هذا المنتزه يُعدُّ مقصدًا مناسبًا للعائلات والزائرين لما يتميز به من هدوءٍ وطبيعةٍ خلابة.<br><br>
+          بعد ذلك جلس الطلاب في مكانٍ آمنٍ ظليل، واستمعوا إلى شرحٍ من معلم العلوم حول أهمية المحافظة على البيئة،
+          ثم قاموا بحملةٍ صغيرة لتنظيف المكان من النفايات التي قد يتركها بعض الزوار، حتى يبقى المنتزهُ جميلًا ونظيفًا.
+          وفي نهاية الرحلة، اجتمع الطلاب لالتقاط صورةٍ جماعية، وشكروا معلميهم على هذه التجربة الممتعة التي تعلّموا فيها الكثير، وعادوا
+          إلى المدرسة وهم يشعرون بالفخر والسعادة.
+        </article>
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+          <button class="btn" id="btnToQuiz">ابدأ الأسئلة</button>
+          <span class="muted" style="font-size:13px">يمكنك الرجوع للنص أثناء الحل.</span>
+        </div>
+      </section>
+
+      <!-- الأسئلة -->
+      <section id="screen-quiz" class="screen">
+        <div class="row" style="align-items:flex-end">
+          <div class="col"><h3 style="margin:0 0 4px">الأسئلة</h3>
+            <div class="muted" id="qCounter">السؤال 1 من 10</div>
           </div>
-        </section>
+          <div class="col"><div class="progress"><i id="progBar"></i></div></div>
+        </div>
+        <div id="questionBox" style="margin-top:12px"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+          <button class="btn secondary" id="btnPrev">السابق</button>
+          <button class="btn" id="btnNext">التالي</button>
+          <button class="btn ghost" id="btnBackToReading">عرض النص</button>
+          <button class="btn" id="btnSubmit" style="margin-inline-start:auto;">إنهاء وإظهار النتيجة</button>
+        </div>
+      </section>
 
-        <!-- نص القراءة -->
-        <section id="screen-reading" class="screen">
-          <h3 style="margin-top:0">اقرأ النص التالي بعناية:</h3>
-          <article class="long-text" id="readingText">
-            <strong>عنوان النص: "رحلة إلى منتزه خَرْطَم"</strong><br><br>
-            في صباحٍ جميلٍ من أيام فصل الشتاء، قرّر طلابُ الصفِّ السادس في مدرسة الإمام الشوكاني القيامَ برحلةٍ تعليميةٍ إلى
-            <em>منتزه خَرْطَم</em>، وهو من الأماكن الطبيعية الجميلة التي يقصدها الزوّار للاستمتاع بالهواء النقي والطبيعة الهادئة.
-            انطلق الطلابُ مع معلميهم بالحافلة وهم يشعرون بالحماس والفرح، وكانوا يتطلّعون لرؤية الأشجار والجبال الصغيرة التي سمعوا عنها كثيرًا.<br><br>
-            حين وصلوا إلى المنتزه، استقبلتهم الطبيعةُ بجمالٍ أخَّاذ؛ فقد انتشرت الأشجارُ الخضراء في كلِّ مكان، وبدت الأرضُ مكسوَّةً بالأعشاب،
-            بينما كان الهواء العليل يُنعش النفوس. بدأ الطلابُ بالتجوّل وهم يسجّلون ملاحظاتهم في دفاترهم، كما التقطوا العديد من الصور التذكارية.
-            وقد أخبرهم المعلم أن هذا المنتزه يُعدُّ مقصدًا مناسبًا للعائلات والزائرين لما يتميز به من هدوءٍ وطبيعةٍ خلابة.<br><br>
-            بعد ذلك جلس الطلاب في مكانٍ آمنٍ ظليل، واستمعوا إلى شرحٍ من معلم العلوم حول أهمية المحافظة على البيئة،
-            ثم قاموا بحملةٍ صغيرة لتنظيف المكان من النفايات التي قد يتركها بعض الزوار، حتى يبقى المنتزهُ جميلًا ونظيفًا.
-            وفي نهاية الرحلة، اجتمع الطلاب لالتقاط صورةٍ جماعية، وشكروا معلميهم على هذه التجربة الممتعة التي تعلّموا فيها الكثير، وعادوا
-            إلى المدرسة وهم يشعرون بالفخر والسعادة.
-          </article>
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
-            <button class="btn" id="btnToQuiz">ابدأ الأسئلة</button>
-            <span class="muted" style="font-size:13px">يمكنك الرجوع للنص أثناء الحل.</span>
-          </div>
-        </section>
+      <!-- النتيجة -->
+      <section id="screen-result" class="screen center">
+        <h2 style="margin:10px 0 6px">نتيجتك</h2>
+        <div class="score-big" id="scoreText">0 / 100</div>
+        <div class="muted" id="remark" style="margin-top:6px">أحسنت!</div>
 
-        <!-- الأسئلة -->
-        <section id="screen-quiz" class="screen">
-          <div class="row" style="align-items:flex-end">
-            <div class="col"><h3 style="margin:0 0 4px">الأسئلة</h3>
-              <div class="muted" id="qCounter">السؤال 1 من 10</div>
-            </div>
-            <div class="col">
-              <div class="progress"><i id="progBar"></i></div>
-            </div>
-          </div>
+        <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+          <button class="btn" id="btnSave">حفظ في التوب فايف</button>
+          <button class="btn ghost" id="btnRetry">إعادة المحاولة</button>
+          <button class="btn" id="btnPrintCert">طباعة الشهادة</button>
+        </div>
 
-          <div id="questionBox" style="margin-top:12px"></div>
+        <h3 style="margin-top:20px">🏆 التوب فايف</h3>
+        <ul class="top5" id="topList"></ul>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
-            <button class="btn secondary" id="btnPrev">السابق</button>
-            <button class="btn" id="btnNext">التالي</button>
-            <button class="btn ghost" id="btnBackToReading">عرض النص</button>
-            <button class="btn" id="btnSubmit" style="margin-inline-start:auto; display:none">إنهاء وإظهار النتيجة</button>
-          </div>
-        </section>
+        <!-- شهادة بسيطة قابلة للطباعة -->
+        <div id="certBox" class="cert" style="display:none">
+          <h3>شهادة إنجاز</h3>
+          <p>نُهدي هذه الشهادة إلى الطالب:</p>
+          <p><strong id="certName">—</strong></p>
+          <p>لحصوله على درجة:</p>
+          <p><strong id="certScore">—</strong> من 100</p>
+          <p>في اختبار الفهم القرائي — رحلة إلى منتزه خرطم</p>
+          <p class="muted">مدرسة الإمام الشوكاني — إعداد الأستاذ مقرن المطيري</p>
+          <p id="certDate" class="muted"></p>
+        </div>
+      </section>
 
-        <!-- النتيجة -->
-        <section id="screen-result" class="screen center">
-          <h2 style="margin:10px 0 6px">نتيجتك</h2>
-          <div class="score-big" id="scoreText">0 / 100</div>
-          <div class="muted" id="remark" style="margin-top:6px">أحسنت!</div>
+      <!-- شاشة عرض التوب فايف من البداية -->
+      <section id="screen-top" class="screen">
+        <h3 style="margin:6px 0 10px">🏆 أعلى 5 درجات</h3>
+        <ul class="top5" id="topList2"></ul>
+        <div style="margin-top:12px">
+          <button class="btn" id="btnBackHome">رجوع</button>
+          <button class="btn ghost" id="btnClearTop">مسح القائمة</button>
+        </div>
+      </section>
 
-          <div style="margin-top:14px">
-            <button class="btn" id="btnSave">حفظ في التوب فايف</button>
-            <button class="btn ghost" id="btnRetry">إعادة المحاولة</button>
-          </div>
-
-          <h3 style="margin-top:20px">🏆 التوب فايف</h3>
-          <ul class="top5" id="topList"></ul>
-        </section>
-
-        <!-- شاشة عرض التوب فايف من البداية -->
-        <section id="screen-top" class="screen">
-          <h3 style="margin:6px 0 10px">🏆 أعلى 5 درجات</h3>
-          <ul class="top5" id="topList2"></ul>
-          <div style="margin-top:12px">
-            <button class="btn" id="btnBackHome">رجوع</button>
-            <button class="btn ghost" id="btnClearTop">مسح القائمة</button>
-          </div>
-        </section>
-
-        <footer class="credit">
-          <span class="sig">إعداد الأستاذ مقرن المطيري</span>
-        </footer>
-      </div>
+      <footer class="credit">
+        <span class="sig">إعداد الأستاذ مقرن المطيري</span>
+      </footer>
     </div>
   </div>
+</div>
 
 <script>
-/* ——— بيانات الاختبار ——— */
+/* ——— إعدادات عامة ——— */
+const EXAM_MINUTES = 12; // مدة الاختبار بالدقائق
+const SHEETS_WEBAPP_URL = ""; 
+// لو تبغى تجميع النتائج في Google Sheets: ضع هنا رابط الويب-آب (Apps Script) وإلا اتركه فارغًا
+
+/* ——— أسئلة ——— */
 const QUESTIONS = [
-  {
-    q: "ما سبب ذهاب الطلاب إلى منتزه خرطم؟",
-    a: ["للعب فقط", "لزيارة قريب", "لرحلة تعليمية واستكشاف المكان", "للتسوق"],
-    correct: 2
-  },
-  {
-    q: "كيف كانت مشاعر الطلاب أثناء الرحلة؟",
-    a: ["الخوف والقلق", "الحماس والفرح", "الحزن", "الملل"],
-    correct: 1
-  },
-  {
-    q: "ماذا فعل الطلاب عند وصولهم إلى المنتزه؟",
-    a: ["عادوا فورًا", "جلسوا في الحافلة", "تجوّلوا وسجّلوا ملاحظاتهم", "ناموا"],
-    correct: 2
-  },
-  {
-    q: "ممَّ تميّز المنتزه بحسب النص؟",
-    a: ["الضوضاء الشديدة", "الهدوء والطبيعة الخلابة", "المحال التجارية الكثيرة", "الألعاب الكهربائية"],
-    correct: 1
-  },
-  {
-    q: "لماذا التقط الطلاب صورًا تذكارية؟",
-    a: ["لإرسالها لإدارة المدرسة فقط", "لأن المعلم طلب منهم دون سبب", "لتوثيق الرحلة والذكرى الجميلة", "للاشتراك في مسابقة تصوير"],
-    correct: 2
-  },
-  {
-    q: "ماذا تعلّم الطلاب من شرح معلم العلوم؟",
-    a: ["أهمية النوم الطويل", "أهمية المحافظة على البيئة", "قواعد كرة القدم", "كيفية التسوق"],
-    correct: 1
-  },
-  {
-    q: "ما الهدف من تنظيف المكان؟",
-    a: ["إضاعة الوقت", "المحافظة على جمال المنتزه ونظافته", "زيادة درجات الحاسوب", "تنفيذ أمر إداري فقط"],
-    correct: 1
-  },
-  {
-    q: "في أي وقت كانت الرحلة؟",
-    a: ["في فصل الشتاء", "في فصل الصيف", "في المساء", "في منتصف الليل"],
-    correct: 0
-  },
-  {
-    q: "أين جلس الطلاب بعد التجوّل؟",
-    a: ["في مكان آمن ظليل", "على الصخور العالية", "وسط الطريق", "داخل المتجر"],
-    correct: 0
-  },
-  {
-    q: "ما الشعور الذي عاد به الطلاب إلى المدرسة؟",
-    a: ["الحزن والغضب", "الفخر والسعادة", "القلق والخوف", "النعاس فقط"],
-    correct: 1
-  }
+  { q:"ما سبب ذهاب الطلاب إلى منتزه خرطم؟", a:["للعب فقط","لزيارة قريب","لرحلة تعليمية واستكشاف المكان","للتسوق"], correct:2 },
+  { q:"كيف كانت مشاعر الطلاب أثناء الرحلة؟", a:["الخوف والقلق","الحماس والفرح","الحزن","الملل"], correct:1 },
+  { q:"ماذا فعل الطلاب عند وصولهم إلى المنتزه؟", a:["عادوا فورًا","جلسوا في الحافلة","تجوّلوا وسجّلوا ملاحظاتهم","ناموا"], correct:2 },
+  { q:"ممَّ تميّز المنتزه بحسب النص؟", a:["الضوضاء الشديدة","الهدوء والطبيعة الخلابة","المحال التجارية الكثيرة","الألعاب الكهربائية"], correct:1 },
+  { q:"لماذا التقط الطلاب صورًا تذكارية؟", a:["لإرسالها لإدارة المدرسة فقط","لأن المعلم طلب دون سبب","لتوثيق الرحلة والذكرى الجميلة","للاشتراك في مسابقة تصوير"], correct:2 },
+  { q:"ماذا تعلّم الطلاب من شرح معلم العلوم؟", a:["أهمية النوم الطويل","أهمية المحافظة على البيئة","قواعد كرة القدم","كيفية التسوق"], correct:1 },
+  { q:"ما الهدف من تنظيف المكان؟", a:["إضاعة الوقت","المحافظة على جمال المنتزه ونظافته","زيادة درجات الحاسوب","تنفيذ أمر إداري فقط"], correct:1 },
+  { q:"في أي وقت كانت الرحلة؟", a:["في فصل الشتاء","في فصل الصيف","في المساء","في منتصف الليل"], correct:0 },
+  { q:"أين جلس الطلاب بعد التجوّل؟", a:["في مكان آمن ظليل","على الصخور العالية","وسط الطريق","داخل المتجر"], correct:0 },
+  { q:"ما الشعور الذي عاد به الطلاب إلى المدرسة؟", a:["الحزن والغضب","الفخر والسعادة","القلق والخوف","النعاس فقط"], correct:1 }
 ];
 
-/* ——— عناصر DOM ——— */
-const screenWelcome = document.getElementById("screen-welcome");
-const screenReading = document.getElementById("screen-reading");
-const screenQuiz = document.getElementById("screen-quiz");
-const screenResult = document.getElementById("screen-result");
-const screenTop    = document.getElementById("screen-top");
+/* ——— عناصر ——— */
+const screenWelcome=document.getElementById("screen-welcome");
+const screenReading=document.getElementById("screen-reading");
+const screenQuiz=document.getElementById("screen-quiz");
+const screenResult=document.getElementById("screen-result");
+const screenTop   =document.getElementById("screen-top");
 
-const btnStart = document.getElementById("btnStart");
-const btnViewTop = document.getElementById("btnViewTop");
-const btnToQuiz = document.getElementById("btnToQuiz");
-const btnBackToReading = document.getElementById("btnBackToReading");
-const btnPrev = document.getElementById("btnPrev");
-const btnNext = document.getElementById("btnNext");
-const btnSubmit = document.getElementById("btnSubmit");
-const btnSave = document.getElementById("btnSave");
-const btnRetry = document.getElementById("btnRetry");
-const btnBackHome = document.getElementById("btnBackHome");
-const btnClearTop = document.getElementById("btnClearTop");
+const btnStart=document.getElementById("btnStart");
+const btnViewTop=document.getElementById("btnViewTop");
+const btnToQuiz=document.getElementById("btnToQuiz");
+const btnBackToReading=document.getElementById("btnBackToReading");
+const btnPrev=document.getElementById("btnPrev");
+const btnNext=document.getElementById("btnNext");
+const btnSubmit=document.getElementById("btnSubmit");
+const btnSave=document.getElementById("btnSave");
+const btnRetry=document.getElementById("btnRetry");
+const btnBackHome=document.getElementById("btnBackHome");
+const btnClearTop=document.getElementById("btnClearTop");
+const btnPrintCert=document.getElementById("btnPrintCert");
 
-const studentNameInput = document.getElementById("studentName");
-const qCounter = document.getElementById("qCounter");
-const progBar = document.getElementById("progBar");
-const questionBox = document.getElementById("questionBox");
-const scoreText = document.getElementById("scoreText");
-const remark = document.getElementById("remark");
-const topList = document.getElementById("topList");
-const topList2 = document.getElementById("topList2");
+const studentNameInput=document.getElementById("studentName");
+const qCounter=document.getElementById("qCounter");
+const progBar=document.getElementById("progBar");
+const questionBox=document.getElementById("questionBox");
+const scoreText=document.getElementById("scoreText");
+const remark=document.getElementById("remark");
+const topList=document.getElementById("topList");
+const topList2=document.getElementById("topList2");
+const certBox=document.getElementById("certBox");
+const certName=document.getElementById("certName");
+const certScore=document.getElementById("certScore");
+const certDate=document.getElementById("certDate");
+const timeLeftEl=document.getElementById("timeLeft");
 
-/* ——— حالة التطبيق ——— */
-let current = 0;                 // رقم السؤال الحالي
-let answers = Array(QUESTIONS.length).fill(null);
-let student = "";
+/* ——— حالة ——— */
+let current=0;
+let answers=Array(QUESTIONS.length).fill(null);
+let student="";
+let startedAt=0;
+let deadlineTs=0;
+let timerId=null;
 
 /* ——— أدوات ——— */
-function show(id){
-  [screenWelcome, screenReading, screenQuiz, screenResult, screenTop].forEach(s=>s.classList.remove("active"));
-  id.classList.add("active");
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
+function show(id){ [screenWelcome,screenReading,screenQuiz,screenResult,screenTop].forEach(s=>s.classList.remove("active")); id.classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
 function renderQuestion(){
-  const q = QUESTIONS[current];
-  qCounter.textContent = `السؤال ${current+1} من ${QUESTIONS.length}`;
-  progBar.style.width = `${(current)/QUESTIONS.length*100}%`;
-
+  const q=QUESTIONS[current];
+  qCounter.textContent=`السؤال ${current+1} من ${QUESTIONS.length}`;
+  progBar.style.width=`${(current)/QUESTIONS.length*100}%`;
   questionBox.innerHTML = `
     <div class="long-text" style="margin-bottom:10px"><strong>${q.q}</strong></div>
     ${q.a.map((opt,i)=>`
       <label class="choice ${answers[current]===i?"selected":""}">
         <input type="radio" name="q${current}" value="${i}" ${answers[current]===i?"checked":""} />
         <div>${opt}</div>
-      </label>
-    `).join("")}
+      </label>`).join("")}
   `;
-
-  // ربط تغيّر الاختيار
-  questionBox.querySelectorAll('input[type="radio"]').forEach(r=>{
-    r.addEventListener('change', e=>{
-      answers[current] = Number(e.target.value);
-      // لون فوري
-      questionBox.querySelectorAll('.choice').forEach((c,idx)=>{
-        c.classList.remove('correct','wrong');
-        if(answers[current]!=null){
-          c.classList.toggle('correct', idx===QUESTIONS[current].correct);
-          c.classList.toggle('wrong', idx!==QUESTIONS[current].correct);
-        }
-      })
-      toggleSubmitBtn();
-    });
-  });
-
-  toggleNavButtons();
 }
-
-function toggleNavButtons(){
-  btnPrev.style.visibility = current===0? "hidden":"visible";
-  btnNext.style.display = current < QUESTIONS.length-1 ? "inline-block":"none";
-  btnSubmit.style.display = current === QUESTIONS.length-1 ? "inline-block":"none";
+function recordAnswer(){
+  const selected=document.querySelector(`input[name="q${current}"]:checked`);
+  if(selected) answers[current]=Number(selected.value);
 }
-
-function toggleSubmitBtn(){
-  // تمكين الإنهاء إذا أجيب على كل الأسئلة
-  const allAnswered = answers.every(v=>v!==null);
-  btnSubmit.disabled = !allAnswered;
-}
-
 function computeScore(){
-  let correct = 0;
-  answers.forEach((ans,i)=>{ if(ans===QUESTIONS[i].correct) correct++; });
-  const score = Math.round((correct/QUESTIONS.length)*100);
-  return score;
+  let c=0; answers.forEach((ans,i)=>{ if(ans===QUESTIONS[i].correct) c++; });
+  return Math.round((c/QUESTIONS.length)*100);
+}
+function saveTop(name,score){
+  const KEY="khartam_top5_v2"; const list=JSON.parse(localStorage.getItem(KEY)||"[]");
+  list.push({name,score,ts:Date.now()}); list.sort((a,b)=> b.score-a.score || a.ts-b.ts);
+  const top5=list.slice(0,5); localStorage.setItem(KEY,JSON.stringify(top5)); return top5;
+}
+function readTop(){ return JSON.parse(localStorage.getItem("khartam_top5_v2")||"[]"); }
+function renderTop(ul,data){ ul.innerHTML=data.length? data.map((r,i)=>`<li><strong>${i+1}. ${r.name}</strong><span class="pill">${r.score}</span></li>`).join(""):`<li style="justify-content:center">لا توجد نتائج بعد</li>`; }
+
+function startTimer(minutes){
+  const ms=minutes*60*1000; startedAt=Date.now(); deadlineTs=startedAt+ms;
+  updateTimer(); timerId=setInterval(updateTimer,500);
+}
+function updateTimer(){
+  const remain=Math.max(0, deadlineTs-Date.now());
+  const mm=Math.floor(remain/60000); const ss=Math.floor((remain%60000)/1000);
+  timeLeftEl.textContent = `${mm.toString().padStart(2,"0")}:${ss.toString().padStart(2,"0")}`;
+  if(remain<=0){ clearInterval(timerId); finishExam(true); }
 }
 
-function saveTop(name, score){
-  const KEY = "khartam_top5_v1";
-  const list = JSON.parse(localStorage.getItem(KEY) || "[]");
-  list.push({name, score, ts: Date.now()});
-  // ترتيب تنازلي ثم قصّ أعلى 5
-  list.sort((a,b)=> b.score - a.score || a.ts - b.ts);
-  const top5 = list.slice(0,5);
-  localStorage.setItem(KEY, JSON.stringify(top5));
-  return top5;
-}
-
-function readTop(){
-  const KEY = "khartam_top5_v1";
-  return JSON.parse(localStorage.getItem(KEY) || "[]");
-}
-
-function renderTop(ul, data){
-  ul.innerHTML = data.length? data.map((row,i)=>`
-    <li>
-      <strong>${i+1}. ${row.name}</strong>
-      <span class="pill">${row.score}</span>
-    </li>
-  `).join("") : `<li style="justify-content:center">لا توجد نتائج بعد</li>`;
+/* ——— إرسال لغوغل شيت (اختياري) ——— */
+async function sendToSheets(payload){
+  if(!SHEETS_WEBAPP_URL) return; // غير مفعّل
+  try{
+    await fetch(SHEETS_WEBAPP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  }catch(e){ /* تجاهل الأخطاء الصامتة */ }
 }
 
 /* ——— أحداث ——— */
 btnStart.addEventListener("click", ()=>{
-  const name = (studentNameInput.value || "").trim();
-  if(!name){ studentNameInput.focus(); studentNameInput.placeholder = "الاسم مطلوب للمتابعة"; return; }
-  student = name;
+  const name=(studentNameInput.value||"").trim();
+  if(!name){ studentNameInput.focus(); studentNameInput.placeholder="الاسم مطلوب للمتابعة"; return; }
+  student=name;
+  startTimer(EXAM_MINUTES);
   show(screenReading);
 });
-
-btnViewTop.addEventListener("click", ()=>{
-  renderTop(topList2, readTop());
-  show(screenTop);
-});
-
+btnViewTop.addEventListener("click", ()=>{ renderTop(topList2, readTop()); show(screenTop); });
 btnBackHome.addEventListener("click", ()=> show(screenWelcome));
-btnClearTop.addEventListener("click", ()=>{
-  localStorage.removeItem("khartam_top5_v1");
-  renderTop(topList2, []);
-});
+btnClearTop.addEventListener("click", ()=>{ localStorage.removeItem("khartam_top5_v2"); renderTop(topList2,[]); });
 
-btnToQuiz.addEventListener("click", ()=>{
-  show(screenQuiz);
-  renderQuestion();
-});
+btnToQuiz.addEventListener("click", ()=>{ show(screenQuiz); renderQuestion(); });
 
 btnBackToReading.addEventListener("click", ()=> show(screenReading));
+btnPrev.addEventListener("click", ()=>{ recordAnswer(); if(current>0){ current--; renderQuestion(); }});
+btnNext.addEventListener("click", ()=>{ recordAnswer(); if(current<QUESTIONS.length-1){ current++; renderQuestion(); }});
 
-btnPrev.addEventListener("click", ()=>{
-  if(current>0){ current--; renderQuestion(); }
-});
+btnSubmit.addEventListener("click", ()=> finishExam(false));
 
-btnNext.addEventListener("click", ()=>{
-  if(current<QUESTIONS.length-1){ current++; renderQuestion(); }
-});
-
-btnSubmit.addEventListener("click", ()=>{
-  const score = computeScore();
-  scoreText.textContent = `${score} / 100`;
-  remark.textContent = score>=90 ? "ممتاز! تألّقت ✨" :
-                       score>=75 ? "أحسنت! تقدّم جميل 👏" :
-                       score>=50 ? "محاولة طيبة — واصل التدريب 💪" :
-                                   "تحتاج مراجعة النص ثم المحاولة مجددًا 📖";
-  // عرض التوب فايف
+function finishExam(timeUp){
+  recordAnswer();
+  const allAnswered = answers.every(v=>v!==null);
+  if(!allAnswered && !timeUp){
+    alert("الرجاء الإجابة على جميع الأسئلة أولًا ✅");
+    return;
+  }
+  if(timerId) clearInterval(timerId);
+  const score=computeScore();
+  scoreText.textContent=`${score} / 100`;
+  remark.textContent = score>=90 ? "ممتاز! تألّقت ✨"
+                    : score>=75 ? "أحسنت! تقدّم جميل 👏"
+                    : score>=50 ? "محاولة طيبة — واصل التدريب 💪"
+                                : "تحتاج مراجعة النص ثم المحاولة مجددًا 📖";
   renderTop(topList, readTop());
   show(screenResult);
-
-  // مؤثر بسيط للفرحة
   if(score>=85){ fireConfetti(); }
-});
+
+  // تجهيز الشهادة
+  certName.textContent = student;
+  certScore.textContent = score;
+  certDate.textContent = new Date().toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'});
+  certBox.style.display = "block";
+
+  // إرسال اختياري لغوغل شيت
+  sendToSheets({name:student, score, when:new Date().toISOString()});
+}
 
 btnSave.addEventListener("click", ()=>{
   if(!student) return;
-  const score = Number(scoreText.textContent.split(" / ")[0]) || 0;
+  const score = Number(scoreText.textContent.split(" / ")[0])||0;
   const updated = saveTop(student, score);
   renderTop(topList, updated);
   renderTop(topList2, updated);
-  btnSave.disabled = true;
-  btnSave.textContent = "تم الحفظ ✅";
+  btnSave.disabled=true; btnSave.textContent="تم الحفظ ✅";
 });
 
 btnRetry.addEventListener("click", ()=>{
-  answers = Array(QUESTIONS.length).fill(null);
-  current = 0;
-  show(screenQuiz);
-  renderQuestion();
+  answers=Array(QUESTIONS.length).fill(null); current=0;
+  startTimer(EXAM_MINUTES);
+  show(screenQuiz); renderQuestion();
 });
 
-/* ——— مؤثر كنفِتي خفيف ——— */
+btnPrintCert.addEventListener("click", ()=>{
+  // أبسط طريقة متوافقة مع iOS: طباعة/حفظ PDF عبر واجهة المتصفح
+  window.print();
+});
+
+/* ——— مؤثر بسيط ——— */
 function fireConfetti(){
-  const canvas = document.createElement("canvas");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  canvas.style.position = "fixed";
-  canvas.style.inset = "0";
-  canvas.style.pointerEvents = "none";
-  canvas.style.zIndex = "9999";
+  const canvas=document.createElement("canvas");
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  canvas.style.position="fixed"; canvas.style.inset="0"; canvas.style.pointerEvents="none"; canvas.style.zIndex="9999";
   document.body.appendChild(canvas);
-  const ctx = canvas.getContext("2d");
-  const N = 120;
-  const parts = Array.from({length:N}).map(()=>({
-    x: Math.random()*canvas.width,
-    y: -20 - Math.random()*canvas.height*0.3,
-    r: 4 + Math.random()*4,
-    vx: (Math.random()-.5)*2,
-    vy: 2 + Math.random()*3,
-    a: .8 + Math.random()*.2
-  }));
-  let t=0;
-  (function frame(){
-    t++;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    parts.forEach(p=>{
-      p.x+=p.vx + Math.sin((p.y+t)/40)*0.4;
-      p.y+=p.vy;
-      ctx.globalAlpha = p.a;
-      // ألوان افتراضية للكانفاس دون تحديد ثيم معيّن
-      ctx.fillStyle = ["#1e7f3d","#2fb36a","#f1c40f","#27ae60","#16a085"][p.r|0 % 5];
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-    });
+  const ctx=canvas.getContext("2d"); const N=120;
+  const parts=Array.from({length:N}).map(()=>({x:Math.random()*canvas.width,y:-20-Math.random()*canvas.height*0.3,r:4+Math.random()*4,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,a:.8+Math.random()*.2}));
+  let t=0; (function frame(){ t++; ctx.clearRect(0,0,canvas.width,canvas.height);
+    parts.forEach(p=>{ p.x+=p.vx + Math.sin((p.y+t)/40)*0.4; p.y+=p.vy; ctx.globalAlpha=p.a; ctx.fillStyle=["#1e7f3d","#2fb36a","#f1c40f","#27ae60","#16a085"][p.r|0 % 5]; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); });
     if(t<260) requestAnimationFrame(frame); else canvas.remove();
   })();
 }
 
-/* ——— تحسينات صغيرة ——— */
-// سماح بالرجوع للنص أثناء الحل دون فقدان الإجابات
-// (الأسئلة محفوظة في الذاكرة حتى يعيد المحاولة)
-
-// منع سحب/تكبير غير مقصود في الجوال
-document.addEventListener('gesturestart', e=>e.preventDefault());
+/* ——— لمنع تكبير بالإيماءات على iOS ——— */
+document.addEventListener('gesturestart', e=>e.preventDefault(), {passive:false});
 </script>
 </body>
 </html>
